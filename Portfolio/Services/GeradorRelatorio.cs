@@ -5,13 +5,7 @@ using PortfolioConsole.Portfolio;
 namespace PortfolioConsole.Services
 {
     public class GeradorRelatorio
-    {
-
-        // (1) Inspecionando Propriedades Dinamicamente (GetProperties)
-        // (2) Invocação Dinâmica de Métodos (GetMethod / Invoke)
-        // (3) Mapeamento de Interfaces (GetInterfaces)
-
-        //Reflection e Polimorfismo: trabalha apenas com a abstração IAtivoFinanceiro e descobre o nome do tipo, suas propriedades e suas interfaces em tempo de execução.
+    {        
         public static void ImprimirRelatorioGeral(PortfolioBase<IAtivoFinanceiro> portfolio)
         {
             // --- IMPRESSÃO FORMATADA ---
@@ -67,12 +61,10 @@ namespace PortfolioConsole.Services
             Console.WriteLine(" ");
 
             foreach (var ativo in portfolio.Ativos)
-            {
-                // Em tempo de execução: obtem ativo com GetType()
+            {                
                 Type tipoAtivo = ativo.GetType();
                 Console.WriteLine($"Tipo: {tipoAtivo.Name}");
-
-                // Em tempo de execução: obtem propriedades do ativo com GetProperties()
+                
                 PropertyInfo[] propriedades = tipoAtivo.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
                 foreach (PropertyInfo propriedade in propriedades)
@@ -81,16 +73,14 @@ namespace PortfolioConsole.Services
 
                     Console.WriteLine($"  {propriedade.Name}: {value}");
                 }
-
-                // Em tempo de execução: obtem método CalcularRentabilidade (se existir) com GetMethod()
+                
                 MethodInfo metodoRentabilidade = tipoAtivo.GetMethod("CalcularRentabilidade");
                 if (metodoRentabilidade != null)
                 {
                     decimal rentabilidade = (decimal)metodoRentabilidade.Invoke(ativo, null);
                     Console.WriteLine($"  Rentabilidade: {rentabilidade}%");
                 }
-
-                // Em tempo de execução: obtem as Interfaces da Classe
+                                
                 var interfaces = tipoAtivo.GetInterfaces()
                     .Where(i => i != typeof(IAtivoFinanceiro))
                     .Select(i => i.Name);
