@@ -5,7 +5,7 @@ using PortfolioConsole.Portfolio;
 namespace PortfolioConsole.Services
 {
     public class GeradorRelatorio
-    {        
+    {
         public static void ImprimirRelatorioGeral(PortfolioBase<IAtivoFinanceiro> portfolio)
         {
             // --- IMPRESSÃO FORMATADA ---
@@ -23,7 +23,6 @@ namespace PortfolioConsole.Services
             Console.WriteLine("(apenas ativos que implementam IGeradorDeRenda)");
             Console.WriteLine(" ");
 
-            //Inspecao da Interface IGeradorDeRenda 
             decimal rendaTotal = 0m;
             foreach (var ativo in portfolio.Ativos)
             {
@@ -43,16 +42,17 @@ namespace PortfolioConsole.Services
             //Inspecao do Método "DiasParaVencimento"
             foreach (var ativo in portfolio.Ativos)
             {
-                MethodInfo metodoDiasParaVencimento = ativo.GetType().GetMethod("DiasParaVencimento");                
-                
-                if (metodoDiasParaVencimento != null)
+                var metodoDiasParaVencimento = ativo.GetType().GetMethod("DiasParaVencimento");
+
+                if(metodoDiasParaVencimento != null)
                 {
-                    var dias = (int)metodoDiasParaVencimento.Invoke(ativo, null);            
+                    var dias = (int)metodoDiasParaVencimento.Invoke(ativo, null);
                     if (dias >= 0 && dias <= 180)
                     {
                         Console.WriteLine($"- {ativo.Nome} -> vence em {dias} dias");
                     }
-                }
+
+                }           
             }
             Console.WriteLine(" ");
 
@@ -61,27 +61,27 @@ namespace PortfolioConsole.Services
             Console.WriteLine(" ");
 
             foreach (var ativo in portfolio.Ativos)
-            {                
-                Type tipoAtivo = ativo.GetType();
-                Console.WriteLine($"Tipo: {tipoAtivo.Name}");
-                
-                PropertyInfo[] propriedades = tipoAtivo.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            {
+                var tipoDoAtivo = ativo.GetType();
+                Console.WriteLine($"Tipo: {tipoDoAtivo.Name}");
 
-                foreach (PropertyInfo propriedade in propriedades)
+                var propriedades = tipoDoAtivo.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (var propriedade in propriedades)
                 {
                     var value = propriedade.GetValue(ativo);
-
                     Console.WriteLine($"  {propriedade.Name}: {value}");
                 }
-                
-                MethodInfo metodoRentabilidade = tipoAtivo.GetMethod("CalcularRentabilidade");
+
+                var metodoRentabilidade = tipoDoAtivo.GetMethod("CalcularRentabilidade");
+
                 if (metodoRentabilidade != null)
                 {
-                    decimal rentabilidade = (decimal)metodoRentabilidade.Invoke(ativo, null);
+                    var rentabilidade = metodoRentabilidade.Invoke(ativo, null);
                     Console.WriteLine($"  Rentabilidade: {rentabilidade}%");
                 }
-                                
-                var interfaces = tipoAtivo.GetInterfaces()
+
+                var interfaces = tipoDoAtivo.GetInterfaces()
                     .Where(i => i != typeof(IAtivoFinanceiro))
                     .Select(i => i.Name);
 
